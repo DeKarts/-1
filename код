@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace INFAME
+{
+    public partial class MainWindow : Window
+    {
+        private string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=INFOR;Integrated Security=True";
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            string username = txtUsername.Text;
+            string password = txtPassword.Password;
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Пожалуйста, заполните все поля.");
+                return;
+            }
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "INSERT INTO AUT (username, password) VALUES (@username, @password)";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        command.Parameters.AddWithValue("@password", password);
+                        command.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Регистрация прошла успешно!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при регистрации: {ex.Message}");
+                }
+            }
+        }
+    }
+}
